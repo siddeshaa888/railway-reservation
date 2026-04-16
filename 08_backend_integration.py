@@ -21,10 +21,11 @@ from typing import Optional
 # DATABASE CONNECTION
 # ─────────────────────────────────────────────────────────────
 DB_CONFIG = {
-    "host":     "localhost",
+"host":     "nozomi.proxy.rlwy.net",
     "user":     "root",
-    "password":     "nmit1234",
+    "password":     "yWkZBNAxfuAbiaQIyCkZYdOQJicgiJgA",
     "database": "railway_db",
+"port":     52237,
     "charset":  "utf8mb4",
 }
 
