@@ -28,7 +28,11 @@ DB_CONFIG = {
     "password": os.getenv("MYSQLPASSWORD"),
     "database": os.getenv("MYSQLDATABASE")
 }
-
+print("DEBUG ENV →",
+      os.getenv("MYSQLHOST"),
+      os.getenv("MYSQLPORT"),
+      os.getenv("MYSQLUSER"),
+      os.getenv("MYSQLDATABASE"))
 def get_connection():
     return mysql.connector.connect(**DB_CONFIG)
 
