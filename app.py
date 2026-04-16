@@ -10,6 +10,7 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import mysql.connector
+import os
 from mysql.connector import Error
 from datetime import date, timedelta
 from typing import Optional
@@ -21,11 +22,11 @@ CORS(app)
 # DATABASE CONFIG — change password if needed
 # ─────────────────────────────────────────────────────────────
 DB_CONFIG = {
-    "host":     "localhost",
-    "user":     "root",
-    "password": "nmit1234",
-    "database": "railway_db",
-    "charset":  "utf8mb4",
+    "host": os.getenv("MYSQLHOST"),
+    "port": int(os.getenv("MYSQLPORT")),
+    "user": os.getenv("MYSQLUSER"),
+    "password": os.getenv("MYSQLPASSWORD"),
+    "database": os.getenv("MYSQLDATABASE")
 }
 
 def get_connection():
