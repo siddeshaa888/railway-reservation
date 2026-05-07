@@ -1,6 +1,9 @@
 -- ============================================================
---   RAILWAY RESERVATION SYSTEM — 02_sample_data.sql
---   All INSERT statements for demo / testing
+--   RAILWAY RESERVATION SYSTEM — 02_sample_data.sql  (UPDATED)
+--   Changes:
+--     • Every train now stops at ALL 8 stations (full route)
+--     • Every train has a Schedule entry for every day
+--       from today through today + 365 days (generated via loop)
 --   Run AFTER 01_schema.sql
 -- ============================================================
 USE railway_db;
@@ -39,41 +42,94 @@ INSERT INTO Train (train_number, train_name, train_type, total_seats) VALUES
 ('22691', 'Rajdhani Express',   'Rajdhani',  500);
 
 -- ─────────────────────────────────────────────────────────────
--- ROUTES (cumulative distance from origin in km)
+-- ROUTES  — every train covers all 8 stations
+--
+-- Station IDs (in insert order above):
+--   1=NDLS(Delhi)  2=BCT(Mumbai)   3=MAS(Chennai)  4=SBC(Bengaluru)
+--   5=HWH(Kolkata) 6=SC(Hyderabad) 7=PUNE(Pune)    8=JP(Jaipur)
+--
+-- Route order chosen to be geographically sensible for each train:
+--   Train 1 (Shatabdi)  : NDLS→JP→PUNE→BCT→SC→MAS→SBC→HWH
+--   Train 2 (Mumbai Raj): BCT→PUNE→SC→SBC→MAS→HWH→JP→NDLS
+--   Train 3 (Coimbatore): MAS→SBC→SC→PUNE→BCT→JP→NDLS→HWH
+--   Train 4 (Rajdhani)  : NDLS→HWH→JP→SC→PUNE→BCT→SBC→MAS
 -- ─────────────────────────────────────────────────────────────
 
--- Train 12028: NDLS → JP → SBC
+-- ── Train 1 (train_id=1): NDLS → JP → PUNE → BCT → SC → MAS → SBC → HWH ──
 INSERT INTO Route (train_id, station_id, stop_number, arrival_time, departure_time, distance_km) VALUES
-(1, 1, 1, NULL,       '06:00:00', 0),
-(1, 8, 2, '09:30:00', '09:35:00', 310),
-(1, 4, 3, '20:00:00', NULL,       2150);
+(1, 1, 1, NULL,        '06:00:00',  0),      -- NDLS  origin
+(1, 8, 2, '09:30:00',  '09:35:00',  310),    -- JP    +310 km
+(1, 7, 3, '15:00:00',  '15:10:00',  1460),   -- PUNE  +1150
+(1, 2, 4, '17:30:00',  '17:45:00',  1650),   -- BCT   +190
+(1, 6, 5, '23:00:00',  '23:10:00',  2300),   -- SC    +650
+(1, 3, 6, '05:30:00',  '05:40:00',  3090),   -- MAS   +790
+(1, 4, 7, '11:00:00',  '11:10:00',  3450),   -- SBC   +360
+(1, 5, 8, '22:00:00',  NULL,        4900);   -- HWH   +1450  terminus
 
--- Train 12951: NDLS → BCT
+-- ── Train 2 (train_id=2): BCT → PUNE → SC → SBC → MAS → HWH → JP → NDLS ──
 INSERT INTO Route (train_id, station_id, stop_number, arrival_time, departure_time, distance_km) VALUES
-(2, 1, 1, NULL,       '16:55:00', 0),
-(2, 2, 2, '08:15:00', NULL,       1384);
+(2, 2, 1, NULL,        '16:55:00',  0),      -- BCT   origin
+(2, 7, 2, '19:10:00',  '19:20:00',  190),    -- PUNE  +190
+(2, 6, 3, '01:30:00',  '01:40:00',  840),    -- SC    +650
+(2, 4, 4, '08:00:00',  '08:10:00',  1210),   -- SBC   +370
+(2, 3, 5, '13:30:00',  '13:40:00',  1570),   -- MAS   +360
+(2, 5, 6, '05:00:00',  '05:10:00',  3020),   -- HWH   +1450
+(2, 8, 7, '18:00:00',  '18:10:00',  3840),   -- JP    +820
+(2, 1, 8, '21:30:00',  NULL,        4168);   -- NDLS  +328  terminus
 
--- Train 11013: MAS → SC → SBC
+-- ── Train 3 (train_id=3): MAS → SBC → SC → PUNE → BCT → JP → NDLS → HWH ──
 INSERT INTO Route (train_id, station_id, stop_number, arrival_time, departure_time, distance_km) VALUES
-(3, 3, 1, NULL,       '07:00:00', 0),
-(3, 6, 2, '14:00:00', '14:10:00', 790),
-(3, 4, 3, '21:30:00', NULL,       1160);
+(3, 3, 1, NULL,        '07:00:00',  0),      -- MAS   origin
+(3, 4, 2, '12:30:00',  '12:40:00',  360),    -- SBC   +360
+(3, 6, 3, '18:00:00',  '18:10:00',  730),    -- SC    +370
+(3, 7, 4, '23:30:00',  '23:40:00',  1380),   -- PUNE  +650
+(3, 2, 5, '01:45:00',  '02:00:00',  1570),   -- BCT   +190
+(3, 8, 6, '13:00:00',  '13:10:00',  2770),   -- JP    +1200
+(3, 1, 7, '16:30:00',  '16:40:00',  3080),   -- NDLS  +310
+(3, 5, 8, '10:00:00',  NULL,        4530);   -- HWH   +1450  terminus
 
--- Train 22691: NDLS → HWH
+-- ── Train 4 (train_id=4): NDLS → HWH → JP → SC → PUNE → BCT → SBC → MAS ──
 INSERT INTO Route (train_id, station_id, stop_number, arrival_time, departure_time, distance_km) VALUES
-(4, 1, 1, NULL,       '17:00:00', 0),
-(4, 5, 2, '10:05:00', NULL,       1450);
+(4, 1, 1, NULL,        '17:00:00',  0),      -- NDLS  origin
+(4, 5, 2, '10:05:00',  '10:15:00',  1450),   -- HWH   +1450
+(4, 8, 3, '22:00:00',  '22:10:00',  2270),   -- JP    +820
+(4, 6, 4, '10:00:00',  '10:10:00',  3430),   -- SC    +1160
+(4, 7, 5, '15:30:00',  '15:40:00',  4080),   -- PUNE  +650
+(4, 2, 6, '17:50:00',  '18:05:00',  4270),   -- BCT   +190
+(4, 4, 7, '23:30:00',  '23:40:00',  4640),   -- SBC   +370
+(4, 3, 8, '05:00:00',  NULL,        5000);   -- MAS   +360   terminus
 
 -- ─────────────────────────────────────────────────────────────
--- SCHEDULES (running dates, relative to today for repeatability)
+-- SCHEDULES — every train available on EVERY date
+--             (today through today + 365 days)
+--
+--  source_station_id = first stop of each train's route
+--  dest_station_id   = last stop of each train's route
+--
+--  Train 1: source=1 (NDLS), dest=5 (HWH)
+--  Train 2: source=2 (BCT),  dest=1 (NDLS)
+--  Train 3: source=3 (MAS),  dest=5 (HWH)
+--  Train 4: source=1 (NDLS), dest=3 (MAS)
 -- ─────────────────────────────────────────────────────────────
-INSERT INTO Schedule (train_id, journey_date, source_station_id, dest_station_id, status) VALUES
-(1, CURDATE() + INTERVAL 1 DAY, 1, 4, 'OnTime'),
-(1, CURDATE() + INTERVAL 2 DAY, 1, 4, 'OnTime'),
-(2, CURDATE() + INTERVAL 1 DAY, 1, 2, 'OnTime'),
-(2, CURDATE() + INTERVAL 3 DAY, 1, 2, 'OnTime'),
-(3, CURDATE() + INTERVAL 1 DAY, 3, 4, 'OnTime'),
-(4, CURDATE() + INTERVAL 2 DAY, 1, 5, 'OnTime');
+DELIMITER $$
+CREATE PROCEDURE seed_schedules()
+BEGIN
+    DECLARE i INT DEFAULT 0;
+    WHILE i <= 365 DO
+        INSERT IGNORE INTO Schedule
+            (train_id, journey_date, source_station_id, dest_station_id, status)
+        VALUES
+            (1, CURDATE() + INTERVAL i DAY, 1, 5, 'OnTime'),
+            (2, CURDATE() + INTERVAL i DAY, 2, 1, 'OnTime'),
+            (3, CURDATE() + INTERVAL i DAY, 3, 5, 'OnTime'),
+            (4, CURDATE() + INTERVAL i DAY, 1, 3, 'OnTime');
+        SET i = i + 1;
+    END WHILE;
+END$$
+DELIMITER ;
+
+CALL seed_schedules();
+DROP PROCEDURE seed_schedules;
 
 -- ─────────────────────────────────────────────────────────────
 -- SEATS  (10 seats × 4 classes × 4 trains via loop procedure)
