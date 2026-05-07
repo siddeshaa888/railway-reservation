@@ -1468,6 +1468,11 @@ async function confirmBooking() {
   const srcSt = stations.find(s => s.station_code === from);
   const dstSt = stations.find(s => s.station_code === to);
 
+  if (!srcSt || !dstSt) {
+    showAlert('book-alert', 'error', 'Station lookup failed. Please refresh the page and try again.');
+    return;
+  }
+
   // Register if no passenger ID
   if (!currentPassengerId) {
     const name  = document.getElementById('p-name').value;
@@ -1494,8 +1499,8 @@ async function confirmBooking() {
     passenger_id:    currentPassengerId,
     schedule_id:     selectedScheduleId,
     class_code:      selectedClass,
-    source_id:       srcSt?.station_id,
-    dest_id:         dstSt?.station_id,
+    source_id:       srcSt.station_id,
+    dest_id:         dstSt.station_id,
     num_passengers:  num,
     payment_method:  pay
   });
